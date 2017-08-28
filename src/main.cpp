@@ -51,6 +51,7 @@ int main(int argc, char* argv[]) {
 	vector<Instance> insts;
 	read_pos(argv[1], insts);
 	write_bmes(argv[2], insts);
+	cout << "transfer format ok" << endl;
 	return 0;
 }
 
