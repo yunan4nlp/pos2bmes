@@ -20,6 +20,13 @@ struct Instance {
 		this->size = size;
 	}
 
+	void clear() {
+		words.clear();
+		chars.clear();
+		pos.clear();
+		size = 0;
+	}
+
 	void save(ofstream &out) const {
 		for (int idx = 0; idx < size; idx++) {
 			const vector<string>& curchar = chars[idx];
@@ -43,15 +50,13 @@ struct Instance {
 };
 
 
-void read_pos(const char* path, vector<Instance>& insts);
 void split_bychar(const string& str, vector<string>& vec, const char separator);
-void write_bmes(const char* path, vector<Instance>& insts);
+void transfer_format(const char* in_path, const char* out_path);
 
 int main(int argc, char* argv[]) {
-	vector<Instance> insts;
-	read_pos(argv[1], insts);
-	write_bmes(argv[2], insts);
+	transfer_format(argv[1], argv[2]);
 	cout << "transfer format ok" << endl;
+	getchar();
 	return 0;
 }
 
@@ -71,15 +76,17 @@ void split_bychar(const string& str, vector<string>& vec, const char separator =
 		vec.push_back(word);
 }
 
-void read_pos(const char* path, vector<Instance>& insts) {
-	insts.clear();
-	ifstream file(path);
-	if (file.is_open()) {
+void transfer_format(const char* in_path, const char* out_path) {
+	ifstream in(in_path);
+	ofstream out(out_path);
+	if (in.is_open() && out.is_open()) {
 		string line;
 		vector<string> info;
-		while (getline(file, line)) {
+		Instance inst;
+		int count = 0;
+		while (getline(in, line)) {
+			inst.clear();
 			split_bychar(line, info, ' ');
-			Instance inst;
 			int sent_len = info.size();
 			inst.resize(sent_len);
 			for (int idx = 0; idx < sent_len; idx++) {
@@ -90,18 +97,14 @@ void read_pos(const char* path, vector<Instance>& insts) {
 				inst.pos[idx] = curinfo.substr(pos + 1, -1);
 				getCharactersFromUTF8String(curword, inst.chars[idx]);
 			}
-			insts.push_back(inst);
+			inst.save(out);
+			count++;
+			if (count % 100000 == 0)
+				cout << count << " ";
 		}
-	}
-	else
-		cout << "open file error" << endl;
-}
-
-void write_bmes(const char* path, vector<Instance>& insts) {
-	ofstream out(path);
-	if(out.is_open()){
-		for (auto it = insts.begin(); it != insts.end(); it++)
-			it->save(out);
+		in.close();
 		out.close();
 	}
+	else
+		cout << "open in/out file error" << endl;
 }
