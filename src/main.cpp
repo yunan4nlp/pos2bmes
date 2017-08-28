@@ -56,7 +56,6 @@ void transfer_format(const char* in_path, const char* out_path);
 int main(int argc, char* argv[]) {
 	transfer_format(argv[1], argv[2]);
 	cout << "transfer format ok" << endl;
-	getchar();
 	return 0;
 }
 
